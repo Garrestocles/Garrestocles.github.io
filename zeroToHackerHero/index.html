@@ -1,0 +1,840 @@
+<!--
+Based on Google IO 2012/2013 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+  <style>
+   .centerImg{
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+   }
+  </style>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Pen Test vs Vulnerability Assessment</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Penetration Test
+          <ul>
+            <li>Exploit vulnerabilities to show impact</li>
+          </ul>
+        </li>
+        <li>Vulnerability Assessments
+          <ul>
+            <li>Find proof of vulnerabilites, with no exploitation</li>
+          </ul>
+        </li>
+        <li>Why the distinction?
+          <ul>
+            <li>Just finding is less intimidating</li>
+            <li>Bug bounties don't want vulns exploited</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Intercepting Proxies</h2>
+      <h3>Your gateway to Web Hacking Heroics</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Need to look at raw HTTP requests/responses
+          <ul>
+            <li>Circumvents client-side controls</li>
+            <li>Faster than browser</li>
+          </ul>
+        </li>
+        <li>Free Proxies:
+          <ul>
+            <li>BURP</li>
+            <li>Zed Attack Proxy</li>
+            <li>Web Scarab</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>GET Method</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/burpGet.png" alt="Description" title="GET Request">
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>POST Method</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/burpPOST.png" alt="Description" title="POST Request">
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Methodology</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Testing Process
+          <ul>
+            <li>Find Functionalities to Test</li>
+            <li>Test Functionalities for Vulnerabilities</li>
+            <li>Report Vulnerabilities</li>
+          </ul>
+        </li>
+        <li>Vulnerability Knowledge
+          <ul>
+            <li>Root Problem</li>
+            <li>How to Find</li>
+            <li>Why it's Bad</li>
+            <li>The Fix</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Obligatory Disclaimer</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Only test sites you own or have express permission to test</li>
+        <li>Follow the Guidlines</li>
+        <li>Don't exploit vulnserabilities on apps you don't own</li>
+        <li>People go to jail for doing this. Don't be one of those people.</li>
+      </ul>
+      <!--<img src="images/careerPath.jpg" width="400" class="centerImg"/>-->
+    </article>
+  </slide>
+
+  <slide class="fill nobackground" style="background-image: url(images/Atlanta_Lightning_Strike_edit1.jpg)">
+    <hgroup>
+      <h2 class="white">Queue Dramatic Thunder & Lightning</h2>
+    </hgroup>
+    <footer class="source white">By David Selby [<a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY-SA 3.0</a> or <a href="http://www.gnu.org/copyleft/fdl.html">GFDL</a>], <a href="http://commons.wikimedia.org/wiki/File%3AAtlanta_Lightning_Strike_edit1.jpg">via Wikimedia Commons</a></footer>
+  </slide>
+
+  <slide class="segue dark nobackground">
+    <hgroup class="auto-fadein">
+      <h2>The Vulnerabilities</h2>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>The Root Problem</h3>
+    </hgroup>
+    <article class="smaller">
+      <ul>
+        <li>Key Elements
+          <ul>
+            <li>User input shows up in response body</li>
+            <li>Insufficient Santization</li>
+          </ul>
+        </li>
+        <li>Goal: Get your code to execute on the page</li>
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+  &lt;div id='Greeting'> Howdy, &lt;div id='username'><b>&lt;script>alert(0)&lt;/script></b>&lt;/div>&lt;/div>
+  &lt;h1>Thrilling Latin Content!&lt;/h1>
+  &lt;p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fringilla vehicula lectus,
+  quis maximus nisl tristique eu. Ut rhoncus viverra urna id faucibus. Nulla magna mauris,
+  venenatis non eleifend condimentum, porttitor in turpis. Fusce at commodo diam. &lt;/p>
+  &lt;a href='//www.site.com/differentThrillingArticle'>More Thrilling Content HERE!!1!&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>How to Find it</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Need to send something in a request that shows up on the web site
+          <ul>
+            <li>Query String</li>
+            <li>Post Body</li>
+            <li>The Entire HTTP Request</li>
+          </ul>
+        </li>
+        <li>Injection depends on landing space
+          <ul>
+            <li>Text Space</li>
+            <li>Attribute Space</li>
+            <li>Script Space</li>
+            <li>URI Space</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Landing Spaces</h3>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+  &lt;script>
+    var thrills = '1337 H@x0rz';
+    funFunc(huzzah){
+      //fun functional code
+    }
+  &lt;/script>
+&lt;/head>
+&lt;body>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h1>Thrilling Web Content!&lt;/h1>
+  &lt;p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fringilla vehicula lectus,
+  quis &lt;a href="//somewhere.com" onmouseover="funFun('surelySafeUserInput')">maximus&lt;/a>
+  nisl tristique eu. Ut rhoncus viverra urna id faucibus. Nulla magna mauris,
+  venenatis non eleifend condimentum, porttitor in turpis. Fusce at commodo diam.&lt;/p>
+&lt;/body>
+&lt;/html>
+      </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Text Space</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Need to get a tag onto the page:</li>
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'><b>&lt;script>alert(0)&lt;/script></b>&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value=""/>
+  No Results for: <b>&lt;p onmouseover='alert(0)'/>Over Here&lt;/p></b>
+  &lt;a href="/advancedSearch.html?input=value"<b>></b>Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Text Space | Filter Evasion</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'><b>&lt;ScRiPt>alert(0)&lt;/sCrIpT></b>&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value=""/>
+  No Results for:<b>&lt;isntThisAGreatPrezo onmouseover='alert(0)'</b> Over Here
+  &lt;a href="/advancedSearch.html?input=value"<b>></b>Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Attribute Space</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'>Scripty&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value="<b>"onfocus="alert(0)</b>"/>
+  No Results for: L33tness
+  &lt;a href="/advancedSearch.html?input=<b>">&lt;script>alert(0)&lt;/script></b>">Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Attribute Space | Filter Evasion</h3>
+    </hgroup>
+    <article class="smaller">
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'>Scripty&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value="<b>"onfocus="alert&amp;#x28;0&amp;#x29;</b>"/>
+  No Results for: L33tness
+  &lt;a href="/advancedSearch.html?input=<b>&amp;quot;>&lt;script>wontWork(0)&lt;/script></b>">Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>URI Space</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'>Scripty&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value=""/>
+  No Results for: L33tness
+  &lt;a <b>href="javascript:alert(0)"</b>>Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>URI Space | Filter Evasion</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;body>
+&lt;div id='Greeting'>
+  Howdy, &lt;div id='username'>Scripty&lt;/div>
+&lt;/div>
+  &lt;img id="logo" src="//site.com/logo.png"/>
+  &lt;h3>Search:&lt;h3>&lt;input type="text" value=""/>
+  No Results for: L33tness
+  &lt;a <b>href="javascript:%61lert%280%29"</b>>Advanced Search&lt;/a>
+&lt;/body>
+&lt;/html>
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Script Space & Filter Evasion</h3>
+    </hgroup>
+    <article>
+        <pre class="prettyprint" data-lang="javascript">
+var willThisWork;
+try{
+  willThisWork = "Nope<b>";alert(0);</b>";
+}catch(error){
+  willThisWork = "Yup<b>";alert(1);//</b>";
+}
+if(true !== true){
+  prompt("Guess this is meaningless now: <b>");}alert(2);{//</b>")
+}
+console.log("Filter Evasion:<b>");aler\u0074(2);("</b>");
+        </pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Scripting</h2>
+      <h3>Why it's Bad & What to do About it</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Why XSS is Bad: Arbitrary JavaScript Execution
+          <ul>
+            <li>Steal Cookies (document.cookies)</li>
+            <li>Redirect Users (window.location)</li>
+            <li>Rewrite Content (document.body.innerHTML)</li>
+            <li>Key Loggers</li>
+            <li>CSRF</li>
+            <li>BEEF Hooks</li>
+            <li>Basically Anything JavaScript Can Do</li>
+          </ul>
+        </li>
+        <li>The Fix
+          <ul>
+            <li>Text Space: Output Encoding</li>
+            <li>WhiteList Filter</li>
+          </ul>
+        </li>
+
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>SQL Injection</h2>
+      <h3>The Root Problem</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Key Elements
+          <ul>
+            <li>User input shows up in SQL query</li>
+            <li>Insufficient santization</li>
+          </ul>
+        </li>
+        <pre class="prettyprint" data-lang="SQL">
+            SELECT title, content FROM articles WHERE id='<b>1337</b>';
+        </pre>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>SQL Injection</h2>
+      <h3>How to find it</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Error-Based
+          <ul>
+            <li>Occurs when web apps show SQL syntax errors to users</li>
+          </ul>
+        </li>
+      </ul>
+      <pre class="prettyprint" data-lang="SQL">
+SELECT title, content FROM articles WHERE title='CyberCloud<b>'</b>';
+      </pre>
+      <pre class="prettyprint" data-lang="SQL">
+SELECT title, content FROM articles WHERE id=1337 <b>SELECT</b>;
+      </pre>
+      <ul>
+        <li>Blind
+          <ul>
+            <li>Occurs when a web app has SQLi, but doesn't show syntax errors.</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>SQL Injection</h2>
+      <h3>Finding Blind SQLi</h3>
+    </hgroup>
+    <article class="smaller">
+      <ul>
+        <li>Math</li>
+        <pre class="prettyprint" data-lang="SQL">
+SELECT title, content FROM articles WHERE id=<b>103-1</b>;
+        </pre>
+        <li>Logical Operators</li>
+        <pre class="prettyprint" data-lang="SQL">
+SELECT title, content FROM articles WHERE id=103<b> AND 1=1</b>;
+SELECT title, content FROM articles WHERE id=103<b> AND 1=0</b>;
+        </pre>
+        <li>String Concatenation</li>
+        <pre class="prettyprint" data-lang="SQL">
+SELECT title, content FROM articles WHERE title=<b>'Cyber'+'Cloud'</b>;
+SELECT title, content FROM articles WHERE title=<b>'Cyber' 'Cloud'</b>;
+SELECT title, content FROM articles WHERE title=<b>'Cyber'||'Cloud'</b>;
+        </pre>
+      </ul>
+
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>SQL Injection</h2>
+      <h3>Why it's Bad & What to do About it</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Why SQLi is Bad:
+          <ul>
+            <li>Unauthorized Database Access</li>
+          </ul>
+        </li>
+        <li>Fix:
+          <ul>
+            <li>Parameterization</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Insufficient Authorization & Authentication</h2>
+      <h3>The Root Problem & Why It's Bad</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Insufficient Authentication
+          <ul>
+            <li>Bypassing mechanisms to identify yourself to the web app</li>
+          </ul>
+        </li>
+        <li>Insufficient Authorization
+          <ul>
+            <li>Doing something beyond what your current user roll should be allowed to do</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Insufficient Authorization & Authentication</h2>
+      <h3>Magic Insufficient Auth. Identifying Questions</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Should I be seeing this content/functionality?
+          <ul>
+            <li>Yes: No problem</li>
+            <li>No: Insufficient auth issue</li>
+          </ul>
+        </li>
+        <li>Do I have to be logged in to see this?
+          <ul>
+            <li>Yes: Insufficient Authorization</li>
+            <li>No: Insufficient Authentication</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Insufficient Authorization & Authentication</h2>
+      <h3>Finding Insufficient Auth.</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Try accessing priviledged content without logging in first</li>
+        <li>Try changing ID numbers</li>
+        <li>Found insufficient authorization? Try it without session data.</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Request Forgery</h2>
+      <h3>The Root Problem</h3>
+    </hgroup>
+    <article class="smaller">
+      <ul>
+        <li>Key Elements
+          <ul>
+            <li>Web app has a predictible request</li>
+            <li>Victim visits a page attacker controls</li>
+          </ul>
+        </li>
+        www.site.com/profile/changePassword.html
+        <pre class="prettyprint" data-lang="html">
+&lt;form action="//site.com/profile/changePass" method="POST">
+  &lt;input type="password" name="newPass" value=""/>
+  &lt;input type="password" name="confirmPass" value=""/>
+  &lt;input type="submit" value="Change Password"/>
+&lt;/form>
+        </pre>
+        www.evil.com/catPicture.html
+        <pre class="prettyprint" data-lang="html">
+&lt;img src="//lolcats.ha/cat.html"/>
+&lt;form action="//site.com/profile/changePass" method="POST">
+  &lt;input type="hidden" name="newPass" value="1337H@x0r"/>
+  &lt;input type="hidden" name="confirmPass" value="1337H@x0r"/>
+  &lt;input type="hidden" value="Change Password"/>
+&lt;/form>
+        </pre>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>CSRF Example Request</h2>
+      <h3>The Legitimate POST</h3>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/legitPost.png" alt="Description" title="POST Request">
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>CSRF Example Request</h2>
+      <h3>The Evil POST</h3>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/evilPost.png" alt="Description" title="POST Request">
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Request Forgery</h2>
+      <h3>The Great Debate</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>How is CSRF Pronounced?</li>
+        <li>The Three Armies
+          <ul>
+            <li>Say each letter: C-S-R-F</li>
+            <li>Slur it together: "Sea Surf"</li>
+            <li>Make it like XSS: XSRF</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Request Forgery</h2>
+      <h3>Most Common Defenses</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Current Password</li>
+        <li>CSRF Token</li>
+        <li><b>Not</b> Cookies</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Request Forgery</h2>
+      <h3>Finding CSRF & Testing Defenses</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Find authenticated functionality</li>
+        <li>Try making an HTML Form to send the value</li>
+        <li>If there's a Token or Password:
+          <ul>
+            <li>Replace value with a made up one</li>
+            <li>Remove parameter's value</li>
+            <li>Remove entire parameter from request</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Cross Site Request Forgery</h2>
+      <h3>Root Problem, Why it's bad, & the Fix</h3>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Root Problem
+          <ul>
+            <li>Attacker can predict request that the victim needs to send to do something</li>
+          </ul>
+        </li>
+        <li>Why It's Bad
+          <ul>
+            <li>Allows attackers to have users do things without their consent</li>
+          </ul>
+        </li>
+        <li>The Fix
+          <ul>
+            <li>Validate current password</li>
+            <li>Strong, properly validated CSRF token</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Miscellaneous Common Vulnerabilities</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>URL Redirection
+          <ul>
+            <li>Occurs when an attacker can control where a user is sent or a resource is gotten from.</li>
+            <li>http://www.site.com/login?successURL=profile.html</li>
+          </ul>
+        </li>
+        <li>Insufficient Transport Layer Protection
+          <ul>
+            <li>Occurs whenever sensitive information isn't sent over HTTPS</li>
+          </ul>
+        </li>
+        <li>Content Spoofing
+          <ul>
+            <li>Occurs when an attacker sticks HTML/text into the page.</li>
+          </ul>
+        </li>
+        <li>Insufficient Session Expiration
+          <ul>
+            <li>Occurs when logout button doesn't work</li>
+          </ul>
+        </li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide class="segue dark nobackground">
+    <hgroup class="auto-fadein">
+      <h2>Bug Bounty Hunting</h2>
+      <h3>Production Safety & Reporting Vulnerabilities</h3>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Production Safety</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Don't do anything that might affect site users.
+          <ul>
+            <li>Altering other users data</li>
+            <li>Leaving persistent tests around where users will see it.</li>
+          </ul>
+        </li>
+        <li>Don't try to get user data </li>
+        <li>Don't use new tools you aren't very familiar with</li>
+        <li>Avoid brute force functionalities</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Writing Proof of Concepts</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Briefly describe the vulnerability you are reporting.</li>
+        <li>Provide a step by step guide to recreate the evidence of the vulnerability in question.</li>
+        <li>Add screenshots when applicable</li>
+        <li>Add other relevant information
+          <ul>
+            <li>browser version</li>
+            <li>date/time</li>
+          </ul>
+        </li>
+        <li>Explanation of potential impact to company's business model.</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Additional Resources</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li><a href="http://projects.webappsec.org/w/page/13246978/Threat%20Classification">WASC Threat Classes</a></li>
+        <li><a href="http://xss-game.appspot.com/">Google's XSS Challenge</a></li>
+        <li><a href="http://xss-quiz.int21h.jp/">Yamagata XSS Challenge</a></li>
+        <li><a href="https://www.hackthissite.org/">Hack This Site</a></li>
+        <li><a href="https://github.com/SpiderLabs/MCIR">Magical Code Injection Rainbow</a></li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide class="thank-you-slide segue nobackground">
+    <article class="flexbox vleft auto-fadein">
+      <h2>&lt;/ZeroToHackerHero&gt;</h2>
+      <p>Thank You!</p>
+    </article>
+    <p class="auto-fadein" data-config-contact>
+      <!-- populated from slide_config.json -->
+    </p>
+  </slide>
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+</body>
+</html>
